@@ -1,0 +1,8 @@
+---
+- hosts: 127.0.0.1
+  roles:
+    - role: repo
+    - role: peervpn
+  vars:
+    TEMP_DIR: /tmp/peervpn-source
+

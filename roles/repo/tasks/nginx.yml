@@ -1,0 +1,14 @@
+- name: Install Nginx
+  package:
+    name: nginx
+    state: latest
+
+- name: Add NGINX virtualhost config
+  template:
+    src=templates/apt-repo.conf
+    dest=/etc/nginx/sites-enabled/apt-repo.conf
+  notify:
+    - NGINX reload
+
+
+

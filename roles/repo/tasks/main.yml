@@ -1,0 +1,25 @@
+---
+- name: create directory if they don't exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+  with_items:
+    - /var/www/repo
+    - /var/www/repo/conf
+    - /var/www/repo/contrib/binary-amd64
+    - /var/www/repo/dists/xenial
+
+- name: Add distributions.conf
+  template:
+    src=templates/distributions.conf
+    dest=/var/www/repo/conf
+
+- name: Add make file
+  template:
+    src=templates/Makefile
+    dest=/var/www/repo
+
+

@@ -1,0 +1,55 @@
+---
+- name: Call the 'common' role to do some general setup
+  include: ../../repo/tasks/main.yml
+
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "{{ TEMP_DIR }}"
+
+- name: Creates directory
+  file:
+    path: "{{ TEMP_DIR }}"
+    state: directory
+
+- git:
+    repo: https://github.com/peervpn/peervpn.git
+    dest: "{{ TEMP_DIR }}"
+
+- name: rename sbin to bin
+  shell: cd {{ TEMP_DIR }} && grep 'sbin' -P -R -I -l  * | xargs sed -i 's/sbin/bin/g' Makefile
+
+- name: Install a list of packages
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libssl1.0-dev
+    - automake
+    - automake1.11
+    - libssl-dev
+    - libssl1.0-dev
+    - openssl
+    - checkinstall 
+
+- name: Download  http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-2.1.6.tar.gz
+  get_url:
+    url:  http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-2.1.6.tar.gz
+    dest: '{{ TEMP_DIR }}/libressl-2.1.6.tar.gz'
+    mode: '0440'
+
+- name: Extract libressl-2.1.6.tar.gz into /tmp/peervpn-source/libressl-2.1.6
+  unarchive:
+    src: '{{ TEMP_DIR }}/libressl-2.1.6.tar.gz'
+    dest: "{{ TEMP_DIR }}"
+
+- name: run command in a path {{ TEMP_DIR }}/libressl-2.1.6
+  shell: 'cd {{ TEMP_DIR }}/libressl-2.1.6 && ./configure && make && make install && ldconfig'
+
+- name: run command in a path {{ TEMP_DIR }}/libressl-2.1.6
+  shell: 'cd {{ TEMP_DIR }} && make all'
+
+- name: run command in a path /tmp/peervpn-source/libressl-2.1.6
+  shell: 'cd {{ TEMP_DIR }} && checkinstall -y'
+
+
